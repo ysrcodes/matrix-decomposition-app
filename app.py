@@ -13,7 +13,8 @@ import pandas as pd
 import streamlit as st
 
 from decomposition import DECOMPOSERS
-from decomposition.qr import decompose as qr_decompose
+from decomposition.lu import run_lu_workflow
+from decomposition.qr import decompose as qr_decompose, run_qr_workflow
 from decomposition.svd import decompose as svd_decompose
 from utils.helpers import matrix_to_csv_bytes, reconstruction_metrics, round_matrix
 from utils.validators import (
@@ -242,8 +243,34 @@ if st.button("Compute decomposition", type="primary"):
         _display_matrix("A (input)", A, decimals=decimals, show_heatmap=show_heatmap)
 
         factors: dict[str, np.ndarray] = result["factors"]
-        for name, mat in factors.items():
-            _display_matrix(name, np.asarray(mat), decimals=decimals, show_heatmap=show_heatmap)
+        if method == "LU":
+            run_lu_workflow(
+                A,
+                result=result,
+                embedded=True,
+                display_factor=lambda lbl, mat: _display_matrix(
+                    lbl,
+                    np.asarray(mat),
+                    decimals=decimals,
+                    show_heatmap=show_heatmap,
+                ),
+            )
+        elif method == "QR":
+            run_qr_workflow(
+                A,
+                result=result,
+                mode=qr_mode,
+                embedded=True,
+                display_factor=lambda lbl, mat: _display_matrix(
+                    lbl,
+                    np.asarray(mat),
+                    decimals=decimals,
+                    show_heatmap=show_heatmap,
+                ),
+            )
+        else:
+            for name, mat in factors.items():
+                _display_matrix(name, np.asarray(mat), decimals=decimals, show_heatmap=show_heatmap)
 
         if verify and "reconstructed" in result and result["reconstructed"] is not None:
             Ah = np.asarray(result["reconstructed"])
