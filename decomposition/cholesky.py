@@ -1,13 +1,11 @@
-def decompose(A: np.ndarray) -> dict[str, Any]:
-    pass
+"""Cholesky decomposition (A = LLᵀ for SPD matrices)."""
 
-# cholesky.py
+from typing import Any
 
 import numpy as np
 
 
 def computing_cholesky_decomposition(matrix):
-
     # convert the matrix into numpy array
     A = np.array(matrix, dtype=float)
 
@@ -33,9 +31,6 @@ def computing_cholesky_decomposition(matrix):
 
     # If all conditions are fulfilled, we can begin cholesky decomposition
     L = np.linalg.cholesky(A)
-    
-    # confirming matrix to check the decomposition is correct
-    L = np.linalg.cholesky(A)
     verify = L @ L.T
 
     return {
@@ -44,28 +39,41 @@ def computing_cholesky_decomposition(matrix):
     }
 
 
+def decompose(A: np.ndarray) -> dict[str, Any]:
+    out = computing_cholesky_decomposition(np.asarray(A, dtype=float))
+    L = out["L"]
+    reconstructed = out["Verify"]
+    return {
+        "method": "Cholesky",
+        "factors": {"L": L},
+        "reconstructed": reconstructed,
+        "explain_steps": [
+            "**A = LLᵀ** where **L** is lower triangular with positive diagonal entries.",
+        ],
+        "metadata": {},
+    }
+
+
 # using a matrix to check the output is right
 
-matrix = [
+if __name__ == "__main__":
+    matrix = [
         [4, 12, -16],
         [12, 37, -43],
-        [-16, -43, 98]
+        [-16, -43, 98],
     ]
- 
 
-try : 
-  
-     result = computing_cholesky_decomposition(matrix)
+    try:
+        result = computing_cholesky_decomposition(matrix)
 
-     print("The Original Matrix:")
-     print(np.array(matrix))
+        print("The Original Matrix:")
+        print(np.array(matrix))
 
-     print("\nL Matrix:")
-     print(result["L"])
+        print("\nL Matrix:")
+        print(result["L"])
 
-     print("\nVerifying Matrix:")
-     print(result["Verify"])
+        print("\nVerifying Matrix:")
+        print(result["Verify"])
 
-except Exception as e:
-
-    print("Error:", e)
+    except Exception as e:
+        print("Error:", e)

@@ -1,12 +1,11 @@
-def decompose(A: np.ndarray) -> dict[str, Any]:
-    pass
-# eigen.py
+"""Eigenvalue decomposition."""
+
+from typing import Any
 
 import numpy as np
 
 
 def computing_eigen(matrix):
-
     # convert to numpy array
     A = np.array(matrix, dtype=float)
 
@@ -28,33 +27,50 @@ def computing_eigen(matrix):
     return {
         "Eigenvalues": eigenvalues,
         "Eigenvectors": eigenvectors,
-        "Verification": verify
+        "Verification": verify,
     }
 
 
-# testing
+def decompose(A: np.ndarray) -> dict[str, Any]:
+    out = computing_eigen(np.asarray(A, dtype=float))
+    eigenvalues = out["Eigenvalues"]
+    eigenvectors = out["Eigenvectors"]
+    reconstructed = out["Verification"]
+    return {
+        "method": "Eigen",
+        "factors": {
+            "Λ": np.diag(eigenvalues),
+            "V": eigenvectors,
+        },
+        "reconstructed": reconstructed,
+        "explain_steps": [
+            "**A = V Λ V⁻¹** where **Λ** is diagonal (eigenvalues) and columns of **V** are eigenvectors.",
+        ],
+        "metadata": {"eigenvalues": eigenvalues},
+    }
 
-matrix = [
-    [5, 7, 10],
-    [1, 4, 11],
-    [9, 17, 21]
-]
 
-try: 
-     result = computing_eigen(matrix)
+if __name__ == "__main__":
+    matrix = [
+        [5, 7, 10],
+        [1, 4, 11],
+        [9, 17, 21],
+    ]
 
-     print("Original Matrix:")
-     print(np.array(matrix))
+    try:
+        result = computing_eigen(matrix)
 
-     print("\nEigenvalues:")
-     print(result["Eigenvalues"])
+        print("Original Matrix:")
+        print(np.array(matrix))
 
-     print("\nEigenvectors:")
-     print(result["Eigenvectors"])
+        print("\nEigenvalues:")
+        print(result["Eigenvalues"])
 
-     print("\nVerifying Matrix:")
-     print(result["Verification"])
+        print("\nEigenvectors:")
+        print(result["Eigenvectors"])
 
-except Exception as e:
+        print("\nVerifying Matrix:")
+        print(result["Verification"])
 
-    print("Error:", e)
+    except Exception as e:
+        print("Error:", e)

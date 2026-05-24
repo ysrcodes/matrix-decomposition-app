@@ -25,7 +25,7 @@ from utils.validators import (
 )
 
 SQUARE_METHODS = {"LU", "Eigen", "Cholesky"}
-METHOD_ORDER = ["LU", "QR", "Eigen", "SVD", "Cholesky", "PCA (SVD)"]
+METHOD_ORDER = ["LU", "QR", "Eigen", "SVD", "Cholesky"]
 
 
 def _display_matrix(label: str, M: np.ndarray, *, decimals: int, show_heatmap: bool) -> None:
@@ -121,7 +121,7 @@ def _run_comparison(A: np.ndarray, methods: list[str]) -> list[tuple[str, float,
 
 st.set_page_config(page_title="Matrix Decomposition Visualizer", layout="wide")
 st.title("Matrix Decomposition Visualizer")
-st.caption("LU · QR · Eigen · SVD · Cholesky · PCA (SVD) — Quantitative Finance cohort-style demo")
+st.caption("LU · QR · Eigen · SVD · Cholesky")
 
 with st.sidebar:
     st.header("Input")
@@ -207,14 +207,10 @@ with col_opt:
 
 qr_mode = "reduced"
 svd_full = False
-pca_k = None
-pca_std = False
 
 with st.expander("Method options"):
     qr_mode = st.select_slider("QR mode", options=["reduced", "complete"], value="reduced")
     svd_full = st.checkbox("SVD full_matrices", value=False)
-    pca_std = st.checkbox("PCA: standardize columns", value=False)
-    pca_k = st.number_input("PCA: n_components (0 = full rank)", min_value=0, max_value=50, value=0)
 
 if st.button("Compute decomposition", type="primary"):
     try:
@@ -238,9 +234,6 @@ if st.button("Compute decomposition", type="primary"):
             result = qr_decompose(A, mode=qr_mode)
         elif method == "SVD":
             result = svd_decompose(A, full_matrices=svd_full)
-        elif method == "PCA (SVD)":
-            k = None if pca_k == 0 else int(pca_k)
-            result = DECOMPOSERS[method](A, n_components=k, standardize=pca_std)
         else:
             result = DECOMPOSERS[method](A)
         elapsed = time.perf_counter() - t0
@@ -261,7 +254,7 @@ if st.button("Compute decomposition", type="primary"):
             c2.metric("max |error|", f"{metrics['max_abs_error']:.2e}")
             c3.metric("Frobenius ||A-Â||", f"{metrics['frobenius_error']:.2e}")
             st.caption(
-                f"Tolerance rtol={metrics['rtol']}, atol={metrics['atol']} — Eigen/ PCA may deviate if rank-defective or low-rank truncation."
+                f"Tolerance rtol={metrics['rtol']}, atol={metrics['atol']} — Eigen may deviate if rank-defective or ill-conditioned."
             )
 
         with st.expander("Step-by-step explanation"):
